@@ -26,7 +26,7 @@ module SessionsHelper
   end
  
   def deny_access
-   store_location
+    store_location
     redirect_to signin_path, :notice => "Please sign in to access this page."
   end
 
@@ -45,12 +45,11 @@ module SessionsHelper
       cookies.signed[:remember_token] || [nil, nil]
     end
 
-    def store_location
+      def store_location
       session[:return_to] = request.fullpath
     end
 
     def clear_return_to
       session[:return_to] = nil
     end
-
 end
