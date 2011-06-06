@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "UsersController" do
+describe UsersController do
   render_views
 
   describe "GET 'index'" do
@@ -13,14 +13,14 @@ describe "UsersController" do
       end
     end
 
-     describe "for signed-in users" do
+    describe "for signed-in users" do
 
       before(:each) do
         @user = test_sign_in(Factory(:user))
         second = Factory(:user, :name => "Bob", :email => "another@example.com")
-        third  = Factory(:user, :name => "Ben", :email => "another@example.net")
+        third = Factory(:user, :name => "Ben", :email => "another@example.net")
 
-       @users = [@user, second, third]
+        @users = [@user, second, third]
         30.times do
           @users << Factory(:user, :email => Factory.next(:email))
         end
@@ -42,8 +42,7 @@ describe "UsersController" do
           response.should have_selector("li", :content => user.name)
         end
       end
-     end
-     
+      
       it "should paginate users" do
         get :index
         response.should have_selector("div.pagination")
@@ -55,8 +54,7 @@ describe "UsersController" do
       end
     end
   end
-
-
+  
   describe "GET 'show'" do
 
     before(:each) do
@@ -87,6 +85,14 @@ describe "UsersController" do
       get :show, :id => @user
       response.should have_selector("h1>img", :class => "gravatar")
     end
+    
+    it "should show the user's microposts" do
+      mp1 = Factory(:micropost, :user => @user, :content => "Foo bar")
+      mp2 = Factory(:micropost, :user => @user, :content => "Baz quux")
+      get :show, :id => @user
+      response.should have_selector("span.content", :content => mp1.content)
+      response.should have_selector("span.content", :content => mp2.content)
+    end
 
   end
 
@@ -100,9 +106,10 @@ describe "UsersController" do
     it "should have the right title" do
       get 'new'
       response.should have_selector("title", :content => "Sign up")
-      end
-    
-    describe "POST 'create'" do
+    end
+  end
+  
+  describe "POST 'create'" do
 
     describe "failure" do
 
@@ -126,8 +133,9 @@ describe "UsersController" do
         post :create, :user => @attr
         response.should render_template('new')
       end
+    end
     
-      describe "success" do
+    describe "success" do
 
       before(:each) do
         @attr = { :name => "New User", :email => "user@example.com",
@@ -140,26 +148,24 @@ describe "UsersController" do
         end.should change(User, :count).by(1)
       end
 
-        it "should sign the user in" do
-        post :create, :user => @attr
-        controller.should be_signed_in
-      end
-
       it "should redirect to the user show page" do
         post :create, :user => @attr
         response.should redirect_to(user_path(assigns(:user)))
-      end    
-    
+      end
+      
       it "should have a welcome message" do
         post :create, :user => @attr
         flash[:success].should =~ /welcome to the sample app/i
       end
+      
+      it "should sign the user in" do
+        post :create, :user => @attr
+        controller.should be_signed_in
       end
-    end
     end
   end
   
-    describe "GET 'edit'" do
+  describe "GET 'edit'" do
 
     before(:each) do
       @user = Factory(:user)
@@ -183,8 +189,9 @@ describe "UsersController" do
                                          :content => "change")
     end
   end
-end
-describe "PUT 'update'" do
+  
+
+  describe "PUT 'update'" do
 
     before(:each) do
       @user = Factory(:user)
@@ -215,11 +222,11 @@ describe "PUT 'update'" do
         @attr = { :name => "New Name", :email => "user@example.org",
                   :password => "barbaz", :password_confirmation => "barbaz" }
       end
-      end
+
       it "should change the user's attributes" do
         put :update, :id => @user, :user => @attr
         @user.reload
-        @user.name.should  == @attr[:name]
+        @user.name.should == @attr[:name]
         @user.email.should == @attr[:email]
       end
 
@@ -233,8 +240,9 @@ describe "PUT 'update'" do
         flash[:success].should =~ /updated/
       end
     end
-
-describe "authentication of edit/update pages" do
+  end
+  
+  describe "authentication of edit/update pages" do
 
     before(:each) do
       @user = Factory(:user)
@@ -252,8 +260,8 @@ describe "authentication of edit/update pages" do
         response.should redirect_to(signin_path)
       end
     end
-end
- describe "for signed-in users" do
+    
+    describe "for signed-in users" do
 
       before(:each) do
         wrong_user = Factory(:user, :email => "user@example.net")
@@ -269,7 +277,10 @@ end
         put :update, :id => @user, :user => {}
         response.should redirect_to(root_path)
       end
- end
+    end
+  end
+  
+  
   describe "DELETE 'destroy'" do
 
     before(:each) do
@@ -310,7 +321,5 @@ end
       end
     end
   end
-  end
   
-  
-
+end
